@@ -43,29 +43,49 @@ def quadr(s, N = 0):
 	return s
 
 
-# def test_setupquad():
-# 	s = {}
-# 	s['Z'] = lambda t: (1 + 0.3 * np.cos(5 * t)) * np.exp(1j*t)               # starfish param
-# 	n = 100;
-# 	s = setupquad(s,n);
-# 	s = []; s.x = Z((0:n-1)/n*2*pi); s = setupquad(s);  % testing s.x input only
-# 	figure; plot(s.x,'k.'); hold on; plot([s.x, s.x+0.2*s.nx].', 'b-'); axis equal
-# 	% Now check that normals from spectral differentiation are accurate:
-# 	Zp = @(s) -1.5*sin(5*s).*exp(1i*s) + 1i*Z(s);        % Z' formula
-# 	s.Zp = Zp;
-# 	t = setupquad(s); norm(t.nx-s.nx)             % should be small
-# 	s = []; s.x = 3; s.Z = Z; s = setupquad(s,100);    % N should override s.x
+import matplotlib.pyplot as plt
 
+def test_quadr():
 
-if __name__=='__main__':
-	# test_setupquad()
+	Z = lambda t: (1 + 0.3 * np.cos(5 * t)) * np.exp(1j*t)               # starfish param
+
 	s = {}
-	s['Z'] = lambda t: (1 + 0.3 * np.cos(5 * t)) * np.exp(1j*t)
-	N = 300
-	s = quadr(s, N)
-	# print(s)
-	import matplotlib.pyplot as plt
+	s['Z'] = Z
+	n = 100
+	s = quadr(s,n)
 	plt.plot(np.real(s['x']),np.imag(s['x']))
+	plt.quiver(s['x'].real, s['x'].imag, s['nx'].real, s['nx'].imag) # plot unit normals
+	plt.axis('equal')
+	plt.title("Case 1: both s['Z'] and N input")
+	plt.show()
+	
+	s = {}
+	s['x'] = Z(np.arange(0,n)/n*2*np.pi)
+	s = quadr(s)  # testing s.x input only
+	plt.clf()
+	plt.plot(s['x'].real, s['x'].imag)
+	plt.quiver(s['x'].real, s['x'].imag, s['nx'].real, s['nx'].imag) # plot unit normals
+	plt.axis('equal')
+	plt.title("Case 2: s['x'] input only")
+	plt.show()
+	# Now check that normals from spectral differentiation are accurate:
+	Zp = lambda s: -1.5 * np.sin(5*s) * np.exp(1j*s) + 1j * Z(s)        # Z' formula
+	s['Zp'] = Zp
+	t = quadr(s)
+	print('error in the normal vec: ', np.linalg.norm(t['nx']-s['nx']))      # should be small
+
+	s = {}
+	s['x'] = 3
+	s['Z'] = Z
+	s = quadr(s,100)    # N should override s.x
+	plt.clf()
+	plt.plot(s['x'].real, s['x'].imag)
+	plt.quiver(s['x'].real, s['x'].imag, s['nx'].real, s['nx'].imag) # plot unit normals
+	plt.axis('equal')
+	plt.title("Case 3: N override s['x']")
 	plt.show()
 
 
+if __name__=='__main__':
+	test_quadr()
+	
