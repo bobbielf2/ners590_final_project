@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Mon Nov 28 11:28:10 2016
 
@@ -12,21 +11,22 @@ from matplotlib import path
 from mpl_toolkits.mplot3d import Axes3D
 from quadr import quadr
 
-def LapSLPmatrix(t,s,a=0):
+
+def LapSLPmatrix(t,s,a = 0,der = 0):
     
     N = s['x'].size
     M = t['x'].size
-    d = np.tile(t['x'],(1,N)) - np.tile(s['x'].T,(M,1))
+    d = np.tile(t['x'],(1,N)) - np.tile(s['x'].T + a,(M,1))
     ny = np.tile(s['nx'].T,(M,1))
     A = -1/2/np.pi*np.log(np.abs(d))*np.tile(s['w'].T,(M,1))
     
     # return A
-    if a == 0:
+    if der == 0:
         return A
     else:
         nx = np.tile(-t['nx'],(1,N))
         An = 1/2/np.pi*np.real(nx/d)
-        if (np.shape(s['x'])==np.shape(t['x'])) & (np.max(np.abs(s['x']+a-t['x'])))<np.exp(-14):
+        if ( N == M ) & np.max(np.abs(s['x']+a-t['x']))<np.exp(-14):
             Andim = An.shape[0]
             di = np.diag_indices(Andim)
             An[di] = -s['cur']/4/np.pi
@@ -36,7 +36,12 @@ def LapSLPmatrix(t,s,a=0):
     
     
 def test_laplaceeval():
-    
+
+    import matplotlib.pyplot as plt
+    from matplotlib import path
+    from mpl_toolkits.mplot3d import Axes3D
+    from quadr import quadr
+
     side     = 'e'
     lptype   = 's'
     N        = 1500
