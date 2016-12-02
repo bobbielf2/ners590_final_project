@@ -11,7 +11,6 @@ from matplotlib import path
 from mpl_toolkits.mplot3d import Axes3D
 from quadr import quadr
 
-
 def LapSLPmatrix(t,s,a = 0,der = 0):
     
     N = s['x'].size
@@ -119,4 +118,5 @@ def test_laplaceeval():
 
 if __name__=='__main__':
     test_laplaceeval()
-    
+   
+
