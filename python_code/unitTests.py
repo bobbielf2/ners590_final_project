@@ -43,7 +43,7 @@ class TestLapSLP(unittest.TestCase):
     
     def setUp(self):
         
-        N              = 500
+        N              = 50
         # source: starfish domain
         a              = 0.3
         w              = 5
@@ -57,9 +57,9 @@ class TestLapSLP(unittest.TestCase):
         self.s         = quadr(self.s,N)
         
         # target
-        nx             = 100
+        nx             = 10
         gx             = (np.arange(1,nx+1)/nx*2-1)*1.5
-        ny             = 100
+        ny             = 10
         gy             = (np.arange(1,ny+1)/ny*2-1)*1.5     # set up plotting
         xx, yy         = np.meshgrid(gx,gy)
         zz             = xx + 1j*yy
