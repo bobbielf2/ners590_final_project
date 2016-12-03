@@ -13,7 +13,7 @@ Goal: Compare FMM and Parallel Evaluation of the Laplace Layer Potentials
 	* Exercise: [Codecademy](http://www.codecademy.com/)
 3. Code the Nystrom discretization of Laplace SLP and DLP
 	* Collaborate this via GitHub
-	* Write test cases
+	* Write test cases: use the [unittest Package](https://docs.python.org/3/library/unittest.html)
 4. Comparison of FMM and Parallel Python
 	* Survey the parallel programming options for python
 		* [Multiprocessing package](https://docs.python.org/3/library/multiprocessing.html)
