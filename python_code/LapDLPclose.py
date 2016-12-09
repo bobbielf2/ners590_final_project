@@ -10,16 +10,15 @@ from cauchyBary import cauchyBary
 
 def LapDLPclose(x,s,tau,side,der=False):
     # Step 1. Find v^- or v^+
-    vb = 0*s['x']
+    vb = (0+0j)*s['x']
     taup = perispecdiff(tau)
     n = vb.size
     for i in range(0,n):
         j = list(range(0,i))+list(range(i+1,n))
         vb[i] = np.sum(np.multiply(np.divide(tau[j]-tau[i],s['x'][j]-s['x'][i]),s['cw'][j])) + taup[i]*s['w'][i]/s['sp'][i]
-    vb = 1/(-2j*np.pi) * vb
+    vb = -1/2j/np.pi * vb
     if side == 'i':
         vb = vb - tau
-    print('vb: ', vb)
 
     # Step 2. Cauchy integral barycentric eval
     if der:
@@ -37,7 +36,7 @@ def testLapDLP():
     from quadr import quadr
     import matplotlib.pyplot as plt
     from LapDLPmatrix import LapDLPmatrix
-    from mpl_toolkits.mplot3d import Axes3D
+    # from mpl_toolkits.mplot3d import Axes3D
 
     side = 'e'
     s = {}
@@ -63,7 +62,9 @@ def testLapDLP():
     fp = lambda z: -1/(z-a)**2
 
     ub = np.real(f(s['x']))
-    # ubp = fp(s['x'])
+    # upb = fp(s['x'])
+    # uxb = np.real(upb)
+    # uyb = -np.imag(upb)
 
     # target
     nx       = 150
@@ -81,10 +82,11 @@ def testLapDLP():
     t['x'] = zz[ii,np.newaxis]
 
     # generate exact solution
-    uexa = np.zeros(zz.shape)
+    uexa = np.empty(zz.shape)
+    uexa.fill(np.nan)
     uexa[ii,np.newaxis] = np.real(f(t['x']))
-    # upexa = 0*zz
-    # upexa[ii,np.newaxis] = fp(t['x'])
+    # uxexa = 0*zz
+    # uxexa[ii,np.newaxis] = np.real(fp(t['x']))
 
     # plot exact solution 
     Z = uexa
@@ -97,7 +99,7 @@ def testLapDLP():
     # fig.colorbar(surf)
     plt.imshow(Z, interpolation='nearest', cmap=plt.cm.jet,
                 origin='lower', extent=[-1.5, 1.5, -1.5, 1.5],
-                vmax=Z.max(), vmin=Z.min())
+                vmax=np.nanmax(Z), vmin=np.nanmin(Z))
     plt.colorbar()
     plt.title('u exact')
     # plt.show()
@@ -107,11 +109,16 @@ def testLapDLP():
         A = -np.eye(n)/2 + LapDLPmatrix(s,s)  # full rank
     else:
         A = np.eye(n)/2 + LapDLPmatrix(s,s)   # has rank-1 nullspace, ok for dense solve
-    tau = np.array(np.asmatrix(A).I.dot(ub))
-    # print('tau size = ',tau.shape)
+    # tau = np.array(np.asmatrix(A).I.dot(ub))
+    tau = np.linalg.lstsq(A,ub)[0]
+    # print('A = ', A)
+    # print('tau = ',tau)
+    # print('A*tau - ub = ',A.dot(tau)-ub)
+    # return
 
     # DLP close eval
-    u = np.zeros(zz.shape)
+    u = np.empty(zz.shape)
+    u.fill(np.nan)
     # up = np.zeros(zz.shape)
     u[ii,np.newaxis] = LapDLPclose(t['x'],s,tau,side)
     # u[ii,np.newaxis], up[ii,np.newaxis] = LapDLPclose(t['x'],s,ub,side,der=1)
@@ -127,7 +134,7 @@ def testLapDLP():
     # fig.colorbar(surf)
     plt.imshow(Z, interpolation='nearest', cmap=plt.cm.jet,
                 origin='lower', extent=[-1.5, 1.5, -1.5, 1.5],
-                vmax=Z.max(), vmin=Z.min())
+                vmax=np.nanmax(Z), vmin=np.nanmin(Z))
     plt.colorbar()
     plt.title('u approx')
     # plt.show()
@@ -137,18 +144,18 @@ def testLapDLP():
     Z = np.log10(abs(u-uexa))
     plt.imshow(Z, interpolation='nearest', cmap=plt.cm.jet,
                 origin='lower', extent=[-1.5, 1.5, -1.5, 1.5],
-                vmax=Z.max(), vmin=Z[Z > -np.inf].min())
+                vmax=np.nanmax(Z), vmin=Z[Z > np.NINF].min())
     plt.colorbar()
     plt.title('u log10 error')
     plt.show()
 
-    # # plot error in up
-    # Z = np.log10(abs(up-upexa))
+    # # plot error in ux
+    # Z = np.log10(abs(ux-uxexa))
     # plt.imshow(Z, interpolation='nearest', cmap=plt.cm.jet,
     #             origin='lower', extent=[-1.5, 1.5, -1.5, 1.5],
-    #             vmax=Z.max(), vmin=Z[Z > -np.inf].min())
+    #             vmax=np.nanmax(Z), vmin=Z[Z > np.NINF].min())
     # plt.colorbar()
-    # plt.title('up log10 error')
+    # plt.title('ux log10 error')
     # plt.show()
     
     # print(Z.min(),Z[Z > -np.inf].min())
