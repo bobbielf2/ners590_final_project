@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Mon Nov 28 11:00:33 2016
 
-@author: haizhu
+@author: haizhu, Bobbie Wu
 """
 import numpy as np
-def LapDLPmatrix(t,s,a):
+def LapDLPmatrix(t,s,a=0,der=0):
     
     N = s['x'].size
     M = t['x'].size
@@ -14,20 +13,25 @@ def LapDLPmatrix(t,s,a):
     ny = np.tile(s['nx'].T,(M,1))
     A = 1/2/np.pi*np.real(ny/d)
     
-    if (np.shape(s['x'])==np.shape(t['x'])) & (np.max(np.abs(s['x']+a-t['x'])))<np.exp(-14):
+    if M == N and (np.max(np.abs(s['x']+a-t['x'])))<1e-14:
+        # print('computing diag elements...',s['cur'].shape)
         Adim = A.shape[0]
         di = np.diag_indices(Adim)
-        A[di] = -s['cur']/4/np.pi
-    A = A*np.tile(s['w'].T,(M,1))
+        A[di] = -s['cur'].flatten()/4/np.pi
+    A = np.asarray(A)*s['w'].T
     
-    csry = np.conjugate(ny)*d
-    nx = np.tile(t['nx'],(1,N))
-    csrx = np.conjugate(nx)*d
-    r = np.abs(d)
-    An = -np.real(csry*csrx)/(r**4)/(2*np.pi)
-    An = An*np.tile(s['w'].T,(M,1))
-    
-    return A, An
+    if der:
+        if 'nx' not in t:
+            raise Exception("target normal t['nx'] not exist!")
+        csry = np.conjugate(ny)*d
+        nx = np.tile(t['nx'],(1,N))
+        csrx = np.conjugate(nx)*d
+        r = np.abs(d)
+        An = -np.real(csry*csrx)/(r**4)/(2*np.pi)
+        An = An*np.tile(s['w'].T,(M,1))
+        return A, An
+
+    return A
 
 #        t1 = np.real(s['tang'])
 #        t2 = np.imag(s['tang'])
