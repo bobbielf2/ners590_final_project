@@ -1,7 +1,13 @@
 # NERS590 Final Project
 
-Collaborators: Bobbie Wu, Hai Zhu
-Goal: Compare FMM and Parallel Evaluation of the Laplace Layer Potentials
+Contributors: Bobbie Wu, Hai Zhu   
+Reference: [Shravan Veerapaneni's publications](www.math.lsa.umich.edu/~shravan/Publications.html), [Alex Barnett's BIE2D package for MATLAB](https://github.com/ahbarnett/BIE2D)
+
+## Goal
+
+1. Simulation of particulate flow based on the Boundary Integral Equation (BIE) method. 
+2. Learn and follow the best practice of modern software engineering. 
+3. Explore options for fast algorithms and parallelism in Python programming.
 
 ## Tasks
 
